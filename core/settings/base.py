@@ -25,7 +25,7 @@ else:
         raise ImportError("Файл production.py не найден")
 
 THEME_APPS = [
-    # "jazzmin",
+    "jazzmin",
 ]
 
 DJANGO_APPS = [
@@ -38,7 +38,9 @@ DJANGO_APPS = [
 ]
 
 MY_APPS = [
-    # Здесь будут ваши приложения
+    'apps.FKJ',
+    'apps.users',
+    'apps.SuperAdmin',
 ]
 
 
@@ -185,3 +187,5 @@ CKEDITOR_5_CONFIGS = {
         },
     },
 }
+
+AUTH_USER_MODEL = 'users.User'

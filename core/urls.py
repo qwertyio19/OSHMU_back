@@ -11,7 +11,9 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
-    
+    path("api/v1/users/", include("apps.users.urls")),
+    path("api/v1/admin/", include("apps.SuperAdmin.urls")),
+    # path("api/v1/fkj/", include("apps.FKJ.urls")),
 )
 
 
