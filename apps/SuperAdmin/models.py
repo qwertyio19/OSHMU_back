@@ -1,12 +1,13 @@
 from django.db import models
 from apps.users.models import User
 
-# class Admin(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
 class Institution(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='institutions',
+        verbose_name='Пользователь',
+    )
     logo = models.ImageField(
         upload_to='logos/',
         null=True, blank=True,
@@ -46,7 +47,7 @@ class Course(models.Model):
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='courses', verbose_name='Учиреждение')
 
     def __str__(self):
-        return f'Курс {str(self.course)} - Учиреждение {str(self.institution)}'
+        return f'Курс {str(self.course)} - Учреждение {str(self.institution)}'
     
     class Meta:
         verbose_name = "Курс"
