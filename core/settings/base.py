@@ -189,55 +189,9 @@ CKEDITOR_5_CONFIGS = {
     },
 }
 
-
 AUTH_USER_MODEL = 'users.User'
 
 
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-REDIS_DB = 0
-
-REDIS_PASSWORD = None
-# settings.py
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PASSWORD": "ваш_пароль", 
-            "SOCKET_CONNECT_TIMEOUT": 5, 
-            "SOCKET_TIMEOUT": 5,  
-        },
-        "KEY_PREFIX": "students"  
-    }
-}
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
-
-AUTH_USER_MODEL = 'users.User'
-
-
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-REDIS_DB = 0
-
-REDIS_PASSWORD = None
-# settings.py
-
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#             "PASSWORD": "ваш_пароль", 
-#             "SOCKET_CONNECT_TIMEOUT": 5, 
-#             "SOCKET_TIMEOUT": 5,  
-#         },
-#         "KEY_PREFIX": "students"  
-#     }
-# }
-# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-# SESSION_CACHE_ALIAS = "default"
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'

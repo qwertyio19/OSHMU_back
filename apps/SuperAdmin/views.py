@@ -1,30 +1,28 @@
 from rest_framework import viewsets
-from .models import Institution, Course, Day, Task
-from .serializers import InstitutionSerializer, CourseSerializer, DaySerializer, TaskSerializer
+from .models import Institution, Faculty, Speciality, Document
+from .serializers import FacultySerializer, SpecialitySerializer, InstitutionSerializer, DocumentSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-from apps.users.permissions import IsAdmin, IsFkj, IsFkjOrReadOnly
+from apps.users.permissions import IsAdminOrFkjExceptCreate, IsAdminOrReadOnly
 
 class InstitutionViewSet(viewsets.ModelViewSet):
     queryset = Institution.objects.all()
     serializer_class = InstitutionSerializer
-    parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [IsAdmin]  # Только админы могут управлять учреждениями
+    permission_classes = [IsAdminOrFkjExceptCreate]
 
-    def perform_create(self, serializer):
-        # Автоматически связываем учреждение с текущим пользователем (админом)
-        serializer.save(user=self.request.user)
 
-class CourseViewSet(viewsets.ModelViewSet):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    permission_classes = [IsFkj] 
+class FacultyViewSet(viewsets.ModelViewSet):
+    queryset = Faculty.objects.all()
+    serializer_class = FacultySerializer
+    permission_classes = [IsAdminOrReadOnly]
 
-class DayViewSet(viewsets.ModelViewSet):
-    queryset = Day.objects.all()
-    serializer_class = DaySerializer
-    permission_classes = [IsFkj] 
 
-class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-    permission_classes = [IsFkjOrReadOnly]  
+class SpecialityViewSet(viewsets.ModelViewSet):
+    queryset = Speciality.objects.all()
+    serializer_class = SpecialitySerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+
+class DocumentViewSet(viewsets.ModelViewSet):
+    queryset = Document.objects.all()
+    serializer_class = DocumentSerializer
+    permission_classes = [IsAdminOrReadOnly]

@@ -1,84 +1,65 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, PracticeInfo, Document
-from apps.students.serializers import  PracticeInfoSerializer, StudentProfileSerializer, DiaryEntrySerializer, StudentCharacteristicSerializer, DocumentSerializer
-from django.core.cache import cache
-from django.http import HttpResponse
+from apps.users.permissions import IsAdmin
+
+from django.shortcuts import get_object_or_404
+
+from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, SendingRaport
+from apps.students.serializers import StudentProfileSerializer, DiaryEntrySerializer, StudentCharacteristicSerializer, SendingRaportSerializer
+
 
 class StudentProfileView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]  # <-- Отключено
+
     def get(self, request):
-        profile = StudentProfile.objects.get(user=request.user)
+        profile = StudentProfile.objects.first()
         serializer = StudentProfileSerializer(profile)
         return Response(serializer.data)
 
     def put(self, request):
-        profile = StudentProfile.objects.get(user=request.user)
+        profile = StudentProfile.objects.first()
         serializer = StudentProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-class DocumentViewSet(viewsets.ModelViewSet):
-    serializer_class = DocumentSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Document.objects.filter(student__user=self.request.user)
-
-    def perform_create(self, serializer):
-        profile = StudentProfile.objects.get(user=self.request.user)
-        serializer.save(student=profile)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DiaryViewSet(viewsets.ModelViewSet):
+
+class DiaryEntryViewSet(viewsets.ModelViewSet):
     serializer_class = DiaryEntrySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]  # <-- Отключено
 
     def get_queryset(self):
-        return DiaryEntry.objects.filter(student__user=self.request.user)
+        return DiaryEntry.objects.all()
 
     def perform_create(self, serializer):
-        profile = StudentProfile.objects.get(user=self.request.user)
-        serializer.save(student=profile)
+        student = StudentProfile.objects.first()
+        serializer.save(student=student)
 
 
-class CharacteristicView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class SendingRaportViewSet(viewsets.ModelViewSet):
+    serializer_class = SendingRaportSerializer
+    permission_classes = [permissions.AllowAny]  # <-- Отключено
+    queryset = SendingRaport.objects.all()
+
+
+class StudentCharacteristicView(APIView):
+    permission_classes = [permissions.AllowAny]  # <-- Отключено
 
     def get(self, request):
-        obj = StudentCharacteristic.objects.get(student__user=request.user)
+        obj = StudentCharacteristic.objects.first()
         serializer = StudentCharacteristicSerializer(obj)
         return Response(serializer.data)
 
     def put(self, request):
-        obj = StudentCharacteristic.objects.get(student__user=request.user)
+        obj = StudentCharacteristic.objects.first()
         serializer = StudentCharacteristicSerializer(obj, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
-class PracticeInfoView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        obj = PracticeInfo.objects.get(student__user=request.user)
-        serializer = PracticeInfoSerializer(obj)
-        return Response(serializer.data)
-
-    def put(self, request):
-        obj = PracticeInfo.objects.get(student__user=request.user)
-        serializer = PracticeInfoSerializer(obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-def test_cache(request):
-    cache.set('my_key', 'hello redis', 30) 
-    value = cache.get('my_key')
-    return HttpResponse(f'Cached value: {value}')

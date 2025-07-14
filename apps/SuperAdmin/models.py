@@ -1,13 +1,12 @@
+import re
 from django.db import models
+from django.forms import ValidationError
 from apps.users.models import User
+from ckeditor.fields import RichTextField
+
 
 class Institution(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='institutions',
-        verbose_name='Пользователь',
-    )
+
     logo = models.ImageField(
         upload_to='logos/',
         null=True, blank=True,
@@ -24,9 +23,16 @@ class Institution(models.Model):
         verbose_name='Тип',
         help_text='Введите тип учреждения/оригнизации'
     )
+
+    def validate_phone_number(value):
+        pattern = r'^\+996\d{9}$'
+        if not re.match(pattern, value):
+            raise ValidationError("Номер телефона должен быть в формате +996XXXXXXXXX")
+
     contact = models.CharField(
         max_length=20,
-        verbose_name='Контакт',
+        verbose_name='Контакт', 
+        validators=[validate_phone_number],
         help_text='Введите номер телефона учреждения/оригнизации'
     )
     address = models.TextField(
@@ -39,40 +45,44 @@ class Institution(models.Model):
     
     class Meta:
         verbose_name = "Создание учреждения"
-        verbose_name_plural = "Создание учреждении"
+        verbose_name_plural = "Создание учреждений"
+    
 
 
-class Course(models.Model):
-    course = models.PositiveSmallIntegerField(verbose_name='Курсы', choices=[(1, '1 курс'), (2, '2 курс'), (3, '3 курс'), (4, '4 курс')])
-    institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='courses', verbose_name='Учиреждение')
+class Faculty(models.Model):
+    faculty = models.CharField(
+        max_length=255,
+        verbose_name='Факультет')
 
     def __str__(self):
-        return f'Курс {str(self.course)} - Учреждение {str(self.institution)}'
+        return self.faculty
     
     class Meta:
-        verbose_name = "Курс"
-        verbose_name_plural = "Курсы"
+        verbose_name = "Факультет"
+        verbose_name_plural = "Факультеты"
 
-class Day(models.Model):
-    day_number = models.PositiveSmallIntegerField(verbose_name='День', help_text='Номер дня в курсе')
-    courses = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='days', verbose_name='Курс')
+
+class Speciality(models.Model):
+    speciality = models.CharField(
+        max_length=255,
+        verbose_name='Специальность')
 
     def __str__(self):
-        return f"День {str(self.day_number)} - Курс {str(self.courses.course)}"
+        return self.speciality
     
     class Meta:
-        verbose_name = "День"
-        verbose_name_plural = "Дни"
+        verbose_name = "Специальность"
+        verbose_name_plural = "Специальности"
 
-class Task(models.Model):
-    description = models.TextField(verbose_name='Введите задание')
-    day = models.ForeignKey(Day, on_delete=models.CASCADE, related_name='tasks', verbose_name='День')
-    order = models.IntegerField(default=0, verbose_name='Порядковый номер задачи')
 
-    class Meta:
-        verbose_name = "Задание"
-        verbose_name_plural = "задания"
-        ordering = ['order']
+class Document(models.Model):
+
+    title = models.CharField(max_length=255, verbose_name='Заголовок документа')
+    content = RichTextField(verbose_name='Содержание документа')
 
     def __str__(self):
-        return f"Задача для {self.day} - {self.description[:20]}..."
+        return self.title or "Документ без названия"
+
+    class Meta:
+        verbose_name = "Документ студента"
+        verbose_name_plural = "Документы студентов"

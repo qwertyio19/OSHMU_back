@@ -1,19 +1,69 @@
 from django.contrib import admin
-from apps.SuperAdmin.models import Institution, Task, Course, Day
+from apps.SuperAdmin.models import Institution, Faculty, Speciality
 from django.utils.html import format_html
-# Register your models here.
+from .translations import *
+from modeltranslation.admin import TranslationAdmin
+from django.contrib import admin
+from apps.SuperAdmin.models import Institution
+from apps.SuperAdmin.translations import *
+from django.utils.html import format_html
+
+
+
 
 @admin.register(Institution)
 class InstitutionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'display_logo', 'name', 'type', 'contact', 'address')
-    
-    def display_logo(self, obj):
-        if obj.logo:  # предполагая, что поле называется 'logo' и это ImageField
-            return format_html('<img src="{}" width="50" height="50" />', obj.logo.url)
-        return "Нет логотипа"
-    
-    display_logo.short_description = 'Logo'
+    fieldsets = (
+        ('Русская версия', {
+            'fields': ['name_ru', 'type_ru', 'address_ru']
+        }),
+        ('Кыргызская версия', {
+            'fields': ['name_ky', 'type_ky', 'address_ky']
+        }),
+        ('Англиская версия', {
+            'fields': ['name_en', 'type_en', 'address_en']
+        }),
+        ('Глобальные', {
+            'fields': ['logo', 'contact']
+        })
+    )
 
-admin.site.register(Course)
-admin.site.register(Day)
-admin.site.register(Task)
+
+class FacultyAdmin(TranslationAdmin):
+    fieldsets = (
+        ('Русская версия', {
+            'fields': ['faculty_ru'],
+        }),
+        ('Кыргызская версия', {
+            'fields': ['faculty_ky'],
+        }),
+        ('Английская версия', {
+            'fields': ['faculty_en'],
+        }),
+    )
+admin.site.register(Faculty, FacultyAdmin)
+
+
+class SpecialityAdmin(TranslationAdmin):
+    fieldsets = (
+        ('Русская версия', {
+            'fields': ['speciality_ru'],
+        }),
+        ('Кыргызская версия', {
+            'fields': ['speciality_ky'],
+        }),
+        ('Английская версия', {
+            'fields': ['speciality_en'],
+        }),
+    )
+admin.site.register(Speciality, SpecialityAdmin)
+
+
+class DocumentAdmin(TranslationAdmin):
+    fieldsets = (
+        ("Русская версия", {'fields': ('title_ru', 'content_ru')}),
+        ("Кыргызская версия", {'fields': ('title_ky', 'content_ky')}),
+        ("Английская версия", {'fields': ('title_en', 'content_en')}),
+    )
+   
+admin.site.register(Document, DocumentAdmin)
