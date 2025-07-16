@@ -1,5 +1,5 @@
 from modeltranslation.translator import register, TranslationOptions
-from apps.students.models import StudentProfile, DiaryEntry, SendingRaport, StudentCharacteristic
+from apps.students.models import StudentProfile, DiaryEntry, SendingReport, StudentCharacteristic, StudentTitles
 
 @register(StudentProfile)
 class StudentProfileTranslationOptions(TranslationOptions):
@@ -15,11 +15,18 @@ class DiaryEntryTranslationOptions(TranslationOptions):
         'date', 'course', 'organization', 'title_behind', 'date_behind',
     )
 
-@register(SendingRaport)
+
+@register(StudentTitles)
+class StudentTitlesTranslationOptions(TranslationOptions):
+    fields = (
+        'mini_title', 'title_document', 'title_documents', 'tasks',
+        'deadline', 'text_report', 'document_report'
+    )
+
+@register(SendingReport)
 class SendingRaportTranslationOptions(TranslationOptions):
     fields = (
-        'title', 'tasks', 'dedline_tasks', 'raport_title', 'raport_text',
-        'document_raport'
+        'tasks', 'report_text'
     )
 
 @register(StudentCharacteristic)

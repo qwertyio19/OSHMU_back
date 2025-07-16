@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.students.models import  StudentProfile, DiaryEntry, StudentCharacteristic, SendingRaport
+from apps.students.models import  StudentProfile, DiaryEntry, StudentCharacteristic, SendingReport, StudentTitles
 from modeltranslation.admin import TranslationAdmin
 from apps.students.translations import *
 
@@ -42,23 +42,42 @@ class DiaryEntryAdmin(TranslationAdmin):
 admin.site.register(DiaryEntry, DiaryEntryAdmin)
 
 
-class SendingRaportAdmin(TranslationAdmin):
+class StudentTitlesAdmin(TranslationAdmin):
     fieldsets = (
         ("Русская версия", {
-            'fields': ['title_ru', 'tasks_ru', 'dedline_tasks_ru', 'raport_title_ru', 'raport_text_ru', 'document_raport_ru']
+            'fields': ['mini_title_ru', 'title_document_ru', 'title_documents_ru', 'tasks_ru', 'deadline_ru', 'text_report_ru', 'document_report_ru']
         }),
         ("Кыргызская версия", {
-            'fields': ['title_ky', 'tasks_ky', 'dedline_tasks_ky', 'raport_title_ky', 'raport_text_ky', 'document_raport_ky']
+            'fields': ['mini_title_ky', 'title_document_ky', 'title_documents_ky', 'tasks_ky', 'deadline_ky', 'text_report_ky', 'document_report_ky']
         }),
         ("Английская версия", {
-            'fields': ['title_en', 'tasks_en', 'dedline_tasks_en', 'raport_title_en', 'raport_text_en', 'document_raport_en']
+            'fields': ['mini_title_en', 'title_document_en', 'title_documents_en', 'tasks_en', 'deadline_en', 'text_report_en', 'document_report_en']
         }),
         ("Общие данные", {
-            'fields': ['file_raport',],
+            'fields': ['logo', 'mini_logo'],
         }),
     )
    
-admin.site.register(SendingRaport, SendingRaportAdmin)
+admin.site.register(StudentTitles, StudentTitlesAdmin)
+
+
+class SendingReportAdmin(TranslationAdmin):
+    fieldsets = (
+        ("Русская версия", {
+            'fields': ['tasks_ru', 'report_text_ru']
+        }),
+        ("Кыргызская версия", {
+            'fields': ['tasks_ky', 'report_text_ky']
+        }),
+        ("Английская версия", {
+            'fields': ['tasks_en', 'report_text_en']
+        }),
+        ("Общие данные", {
+            'fields': ['link_report', 'file_report',],
+        }),
+    )
+   
+admin.site.register(SendingReport, SendingReportAdmin)
 
 
 class StudentCharacteristicAdmin(TranslationAdmin):

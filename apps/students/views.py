@@ -1,16 +1,14 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.users.permissions import IsAdmin
-
-from django.shortcuts import get_object_or_404
-
-from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, SendingRaport
-from apps.students.serializers import StudentProfileSerializer, DiaryEntrySerializer, StudentCharacteristicSerializer, SendingRaportSerializer
+from apps.users.permissions import IsAdmin, IsStudentOrReadOnly, IsAdminOrReadOnly
+from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, SendingReport, StudentTitles
+from apps.students.serializers import StudentProfileSerializer, DiaryEntrySerializer, StudentCharacteristicSerializer, SendingReportSerializer, StudentTitlesSerializer
+from apps.users.tasks import process_sending_report
 
 
 class StudentProfileView(APIView):
-    permission_classes = [permissions.AllowAny]  # <-- Отключено
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         profile = StudentProfile.objects.first()
@@ -29,7 +27,7 @@ class StudentProfileView(APIView):
 
 class DiaryEntryViewSet(viewsets.ModelViewSet):
     serializer_class = DiaryEntrySerializer
-    permission_classes = [permissions.AllowAny]  # <-- Отключено
+    permission_classes = [IsStudentOrReadOnly]
 
     def get_queryset(self):
         return DiaryEntry.objects.all()
@@ -39,14 +37,24 @@ class DiaryEntryViewSet(viewsets.ModelViewSet):
         serializer.save(student=student)
 
 
-class SendingRaportViewSet(viewsets.ModelViewSet):
-    serializer_class = SendingRaportSerializer
-    permission_classes = [permissions.AllowAny]  # <-- Отключено
-    queryset = SendingRaport.objects.all()
+class StudentTitlesViewSet(viewsets.ModelViewSet):
+    serializer_class = StudentTitlesSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    queryset = StudentTitles.objects.all()
+
+
+class SendingReportViewSet(viewsets.ModelViewSet):
+    serializer_class = SendingReportSerializer
+    permission_classes = [IsStudentOrReadOnly]
+    queryset = SendingReport.objects.all()
+
+    def perform_create(self, serializer):
+        report = serializer.save()
+        process_sending_report.delay(report.id)
 
 
 class StudentCharacteristicView(APIView):
-    permission_classes = [permissions.AllowAny]  # <-- Отключено
+    permission_classes = [IsStudentOrReadOnly]
 
     def get(self, request):
         obj = StudentCharacteristic.objects.first()

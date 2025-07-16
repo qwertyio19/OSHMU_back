@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, SendingRaport
+from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, SendingReport, StudentTitles
 
 class StudentProfileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,14 +23,31 @@ class DiaryEntrySerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class SendingRaportSerializer(serializers.ModelSerializer):
+class StudentTitlesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SendingRaport
+        model = StudentTitles
         fields = [
-            'id', 'title', 'tasks', 'dedline_tasks',
-            'raport_title', 'raport_text', 'document_raport', 'file_raport'
+            'id', 'mini_title', 'mini_logo', 'logo',
+            'title_document', 'title_documents', 'tasks', 'deadline', 'text_report',
+            'document_report'
         ]
         read_only_fields = ['id']
+
+
+class SendingReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SendingReport
+        fields = [
+            'id', 'tasks',
+            'report_text', 'link_report', 'file_report'
+        ]
+        read_only_fields = ['id']
+
+    def validate_file_report(self, value):
+        max_size_mb = 15
+        if value.size > max_size_mb * 1024 * 1024:
+            raise serializers.ValidationError(f"Файл слишком большой. Максимум {max_size_mb} МБ.")
+        return value
 
 
 class StudentCharacteristicSerializer(serializers.ModelSerializer):

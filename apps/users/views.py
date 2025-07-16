@@ -12,15 +12,15 @@ from rest_framework.generics import CreateAPIView
 
 class StudentCreateView(CreateAPIView):
     serializer_class = StudentCreateSerializer
-    # permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin]
 
 class FKJCreateView(CreateAPIView):
     serializer_class = FKJCreateSerializer
-    # permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin]
 
 class AdminCreateView(CreateAPIView):
     serializer_class = AdminCreateSerializer
-    # permission_classes = [IsAdmin]
+    permission_classes = [IsAdmin]
 
 
 

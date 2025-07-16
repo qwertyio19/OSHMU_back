@@ -1,5 +1,4 @@
 from django.db import models
-from apps.users.models import User
 from multiselectfield import MultiSelectField
 from apps.SuperAdmin.models import Faculty, Speciality
 from apps.students.models import StudentProfile
@@ -39,6 +38,18 @@ class Practice(models.Model):
         ('Spring', 'Весенний'),
     ]
 
+    course = models.PositiveSmallIntegerField(
+        choices=[
+            (1, '1 курс'),
+            (2, '2 курс'),
+            (3, '3 курс'),
+            (4, '4 курс'),
+        ],
+        null=True, blank=True,
+        verbose_name='Курс'
+    )
+
+    number = models.CharField(max_length=255, verbose_name="Номер практики")
     practice_type = models.CharField(max_length=30, choices=PRACTICE_TYPES, verbose_name="Тип практики")
     work_days = MultiSelectField(choices=WEEKDAY_CHOICES, verbose_name="Дни практики",)
     reception = models.CharField(max_length=20, choices=RECEPTION, verbose_name="Приём")
@@ -78,3 +89,22 @@ class Practice(models.Model):
     class Meta:
         verbose_name = "Создание практики"
         verbose_name_plural = "Создание практик"
+
+
+
+class TitlesFkj(models.Model):
+    period = models.CharField(max_length=255, verbose_name='Заголовок "Период:"', default='Период:')
+    working_days = models.CharField(max_length=255, verbose_name='Заголовок "Рабочие дни:"', default='Рабочие дни:')
+    opening_hours = models.CharField(max_length=255, verbose_name='Заголовок "Часы работы:"', default='Часы работы:')
+    type_of_practice = models.CharField(max_length=255, verbose_name='Заголовок "Тип практики:"', default='Тип практики:')
+    add_students = models.CharField(max_length=255, verbose_name='Заголовок "Добавить студентов:"', default='Добавить студентов:')
+    results = models.CharField(max_length=255, verbose_name='Заголовок "Результаты:"', default='Результаты:')
+    download_pdf = models.CharField(max_length=255, verbose_name='Заголовок "Скачать PDF"', default='Скачать PDF')
+    download_exel = models.CharField(max_length=255, verbose_name='Заголовок "Скачать Excel"', default='Скачать Excel')
+
+    def __str__(self):
+        return self.mini_title
+
+    class Meta:
+        verbose_name = 'Заголовки ФКЖ'
+        verbose_name_plural = 'Заголовки ФКЖ'

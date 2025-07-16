@@ -9,7 +9,7 @@ router = DefaultRouter()
 urlpatterns = [
     path('', include(router.urls)),
     path('login/', LoginView.as_view(), name='api-login'),
-    path('create/student/', StudentCreateView.as_view()),
+    path('create/students/', StudentCreateView.as_view()),
     path('create/fkj/', FKJCreateView.as_view()),
     path('create/admin/', AdminCreateView.as_view()),
 ]

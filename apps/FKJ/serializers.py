@@ -1,7 +1,5 @@
 from rest_framework import serializers
-# from apps.FKJ.models import FKJUser
-from apps.FKJ.models import Practice
-from apps.FKJ.models import Faculty, Speciality
+from apps.FKJ.models import Practice, TitlesFkj, Faculty, Speciality
 from apps.students.models import StudentProfile
 
 
@@ -28,6 +26,8 @@ class PracticeSerializer(serializers.ModelSerializer):
         model = Practice
         fields = [
             'id',
+            'number',
+            'course',
             'practice_type',
             'start_date',
             'end_date',
@@ -42,3 +42,11 @@ class PracticeSerializer(serializers.ModelSerializer):
             'students',
         ]
   
+
+class TitlesFkjSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TitlesFkj
+        fields = [
+            'id', 'period', 'working_days', 'opening_hours', 'type_of_practice', 'add_students', 'results', 'download_pdf', 'download_exel'
+        ]
+        read_only_fields = ['id']

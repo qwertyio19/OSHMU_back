@@ -20,10 +20,15 @@ class User(AbstractUser):
             (2, '2 курс'),
             (3, '3 курс'),
             (4, '4 курс'),
+            (5, '5 курс'),
+            (6, '6 курс'),
+            (7, '7 курс'),
         ],
         null=True, blank=True,
         verbose_name='Курс'
     )
+    speciality = models.ForeignKey('SuperAdmin.Speciality', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Специальность")
+    institution = models.ForeignKey('SuperAdmin.Institution', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Учреждение")
 
     USERNAME_FIELD = 'full_name'
     REQUIRED_FIELDS = []

@@ -86,3 +86,32 @@ class Document(models.Model):
     class Meta:
         verbose_name = "Документ студента"
         verbose_name_plural = "Документы студентов"
+
+
+class TitlesAdmin(models.Model):
+    full_name = models.CharField(max_length=300, verbose_name='Заголовок "ФИО"', default='ФИО')
+    faculty = models.CharField(max_length=300, verbose_name='Заголовок "Факультет"', default='Факультет')
+    institution = models.CharField(max_length=300, verbose_name='Заголовок "Учреждение"', default='Учреждение')
+    type_institution = models.CharField(max_length=300, verbose_name='Заголовок "Тип учреждения"', default='Тип учреждения')
+    address = models.CharField(max_length=300, verbose_name='Заголовок "Адрес"', default='Адрес')
+    phone_number = models.CharField(max_length=300, verbose_name='Заголовок "Телефон"', default='Телефон')
+    students = models.CharField(max_length=300, verbose_name='Заголовок "Студенты"', default='Студенты')
+    institution_organization = models.CharField(max_length=300, verbose_name='Заголовок "Учреждение/Организация"', default='Учреждение/Организация')
+    course = models.CharField(max_length=300, verbose_name='Заголовок "Курс"', default='Курс')
+    metodist = models.CharField(max_length=300, verbose_name='Заголовок "Методист"', default='Методист')
+    period = models.CharField(max_length=300, verbose_name='Заголовок "Период"', default='Период')
+
+    name = models.CharField(max_length=300, verbose_name='Заголовок "Название"', default='Название')
+    type = models.CharField(max_length=300, verbose_name='Заголовок "Тип"', default='Тип')
+    contacts = models.CharField(max_length=300, verbose_name='Заголовок "Контакты"', default='Контакты')
+
+    full_name_fkj = models.CharField(max_length=300, verbose_name='Заголовок "Имя фамилия ФКЖ"', default='Имя фамилия ФКЖ')
+    login = models.CharField(max_length=300, verbose_name='Заголовок "Логин"', default='Логин')
+    password = models.CharField(max_length=300, verbose_name='Заголовок "Пароль"', default='Пароль')
+
+    def __str__(self):
+        return self.period
+
+    class Meta:
+        verbose_name = "Заголовок суперадмина"
+        verbose_name_plural = "Заголовки суперадмина"

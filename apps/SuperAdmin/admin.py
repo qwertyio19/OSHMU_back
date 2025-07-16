@@ -1,13 +1,10 @@
 from django.contrib import admin
-from apps.SuperAdmin.models import Institution, Faculty, Speciality
-from django.utils.html import format_html
+from apps.SuperAdmin.models import Institution, Faculty, Speciality, TitlesAdmin
 from .translations import *
 from modeltranslation.admin import TranslationAdmin
 from django.contrib import admin
 from apps.SuperAdmin.models import Institution
 from apps.SuperAdmin.translations import *
-from django.utils.html import format_html
-
 
 
 
@@ -67,3 +64,24 @@ class DocumentAdmin(TranslationAdmin):
     )
    
 admin.site.register(Document, DocumentAdmin)
+
+
+class TitlesAdminAdmin(TranslationAdmin):
+    fieldsets = (
+        ('Русская версия', {
+            'fields': ['full_name_ru', 'faculty_ru', 'institution_ru', 'type_institution_ru', 'address_ru',
+                       'phone_number_ru', 'students_ru', 'institution_organization_ru', 'course_ru', 'metodist_ru',
+                       'period_ru', 'name_ru', 'type_ru', 'contacts_ru', 'full_name_fkj_ru', 'login_ru', 'password_ru'],
+        }),
+        ('Кыргызская версия', {
+            'fields': ['full_name_ky', 'faculty_ky', 'institution_ky', 'type_institution_ky', 'address_ky',
+                       'phone_number_ky', 'students_ky', 'institution_organization_ky', 'course_ky', 'metodist_ky',
+                       'period_ky', 'name_ky', 'type_ky', 'contacts_ky', 'full_name_fkj_ky', 'login_ky', 'password_ky'],
+        }),
+        ('Английская версия', {
+            'fields': ['full_name_en', 'faculty_en', 'institution_en', 'type_institution_en', 'address_en',
+                       'phone_number_en', 'students_en', 'institution_organization_en', 'course_en', 'metodist_en',
+                       'period_en', 'name_en', 'type_en', 'contacts_en', 'full_name_fkj_en', 'login_en', 'password_en'],
+        }),
+    )
+admin.site.register(TitlesAdmin, TitlesAdminAdmin)

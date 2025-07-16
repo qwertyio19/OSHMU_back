@@ -1,7 +1,6 @@
 from rest_framework import viewsets
-from .models import Institution, Faculty, Speciality, Document
-from .serializers import FacultySerializer, SpecialitySerializer, InstitutionSerializer, DocumentSerializer
-from rest_framework.parsers import MultiPartParser, FormParser
+from .models import Institution, Faculty, Speciality, Document, TitlesAdmin
+from .serializers import FacultySerializer, SpecialitySerializer, InstitutionSerializer, DocumentSerializer, TitlesAdminSerializer
 from apps.users.permissions import IsAdminOrFkjExceptCreate, IsAdminOrReadOnly
 
 class InstitutionViewSet(viewsets.ModelViewSet):
@@ -25,4 +24,10 @@ class SpecialityViewSet(viewsets.ModelViewSet):
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.all()
     serializer_class = DocumentSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+
+class TitlesAdminViewSet(viewsets.ModelViewSet):
+    queryset = TitlesAdmin.objects.all()
+    serializer_class = TitlesAdminSerializer
     permission_classes = [IsAdminOrReadOnly]

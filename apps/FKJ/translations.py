@@ -1,10 +1,11 @@
 from modeltranslation.translator import register, TranslationOptions
-from apps.FKJ.models import Practice
+from apps.FKJ.models import Practice, TitlesFkj
 
 
 @register(Practice)
 class PracticeTranslation(TranslationOptions):
     fields = (
+        'number',
         'practice_type',
         'start_date',
         'end_date',
@@ -17,3 +18,7 @@ class PracticeTranslation(TranslationOptions):
         'faculty',
         'speciality',
     )
+
+@register(TitlesFkj)
+class TitlesFkjTranslation(TranslationOptions):
+    fields = ('period', 'working_days', 'opening_hours', 'type_of_practice', 'add_students', 'results', 'download_pdf', 'download_exel')

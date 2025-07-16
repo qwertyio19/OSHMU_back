@@ -88,3 +88,17 @@ class IsAdminOrFkjExceptCreate(permissions.BasePermission):
             return True
 
         return False
+    
+
+class IsStudentOrReadOnly(permissions.BasePermission):
+    """
+    Студенты могут всё, остальные — только читать.
+    """
+
+    def has_permission(self, request, view):
+        # Если запрос только на чтение — разрешить
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Только студент может делать небезопасные действия
+        return request.user.is_authenticated and request.user.role == 'student'
