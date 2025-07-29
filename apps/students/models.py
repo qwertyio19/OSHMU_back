@@ -13,10 +13,10 @@ class StudentTitles(models.Model):
     tasks = models.CharField(max_length=255, verbose_name='Заголовок "Задачи"', default='Задачи')
     deadline = models.CharField(max_length=255, verbose_name='Заголовок "Дедлайн"', default='Дедлайн')
     text_report = models.CharField(max_length=255, verbose_name='Заголовок "Текстовый отчет"', default='Текстовый отчет')
-    document_report = models.URLField(verbose_name='Заголовок "Документальный отчет"', default='Документальный отчет')
+    document_report = models.CharField(max_length=255, verbose_name='Заголовок "Документальный отчет"', default='Документальный отчет')
 
     def __str__(self):
-        return self.title
+        return self.mini_title
 
     class Meta:
         verbose_name = "Заголовок студента"

@@ -121,7 +121,7 @@ class TitlesFkj(models.Model):
     download_exel = models.CharField(max_length=255, verbose_name='Заголовок "Скачать Excel"', default='Скачать Excel')
 
     def __str__(self):
-        return self.mini_title
+        return self.period
 
     class Meta:
         verbose_name = 'Заголовки ФКЖ'
