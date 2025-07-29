@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.SuperAdmin.models import Institution, Faculty, Speciality, Document, TitlesAdmin
+from apps.SuperAdmin.models import Institution, Faculty, Speciality, Document, TitlesAdmin, Language
 
 
 
@@ -14,11 +14,17 @@ class SpecialitySerializer(serializers.ModelSerializer):
         model = Speciality
         fields = ['id', 'speciality']
 
+
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = ['id', 'language']
+
         
 class InstitutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Institution
-        fields = ["id", "logo", "name", "type", "contact", "address"]
+        fields = ["id", "fkj", "logo", "name", "type", "contact", "address"]
         read_only_fields = ['id']
         
 

@@ -1,7 +1,6 @@
 from django.db import models
 from multiselectfield import MultiSelectField
-from apps.SuperAdmin.models import Faculty, Speciality
-from apps.students.models import StudentProfile
+from apps.SuperAdmin.models import Faculty, Speciality, Language
 
 
 
@@ -44,6 +43,9 @@ class Practice(models.Model):
             (2, '2 курс'),
             (3, '3 курс'),
             (4, '4 курс'),
+            (5, '5 курс'),
+            (6, '6 курс'),
+            (7, '7 курс'),
         ],
         null=True, blank=True,
         verbose_name='Курс'
@@ -51,7 +53,7 @@ class Practice(models.Model):
 
     number = models.CharField(max_length=255, verbose_name="Номер практики")
     practice_type = models.CharField(max_length=30, choices=PRACTICE_TYPES, verbose_name="Тип практики")
-    work_days = MultiSelectField(choices=WEEKDAY_CHOICES, verbose_name="Дни практики",)
+    work_days = MultiSelectField(choices=WEEKDAY_CHOICES, verbose_name="Дни практики")
     reception = models.CharField(max_length=20, choices=RECEPTION, verbose_name="Приём")
     semester = models.CharField(max_length=20, choices=SEMESTER, verbose_name="Семестр")
     education_form = models.CharField(max_length=20, choices=EDUCATION_FORMS, verbose_name="Форма обучения")
@@ -76,11 +78,27 @@ class Practice(models.Model):
         verbose_name='Специальность'
     )
 
+    language = models.ForeignKey(
+        Language,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='language_lessons',
+        verbose_name='Язык обучения'
+    )
+
     students = models.ManyToManyField(
-        StudentProfile,
-        verbose_name='Студенты',
+        'users.User',
         related_name='practices',
-        blank=True
+        limit_choices_to={'role': 'student'},
+        verbose_name='Студенты'
+    )
+
+    institution = models.ForeignKey(
+        'SuperAdmin.Institution',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='institution_practices',
+        verbose_name='Учреждение'
     )
 
     def __str__(self):

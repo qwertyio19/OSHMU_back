@@ -1,3 +1,6 @@
+import random
+from django.db import models
+from django.utils.crypto import get_random_string
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -12,8 +15,11 @@ class User(AbstractUser):
         verbose_name="Имя пользователя"
     )
     full_name = models.CharField(verbose_name="Полное имя", max_length=255, unique=True)
-    faculty = models.ForeignKey('SuperAdmin.Faculty', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Факультет")
     role = models.CharField(max_length=20, choices=[('student', 'Студент'), ('fkj', 'ФКЖ'), ('admin', 'Суперадмин')], default='student', verbose_name="Роль")
+    faculty = models.ForeignKey('SuperAdmin.Faculty', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Факультет")
+    speciality = models.ForeignKey('SuperAdmin.Speciality', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Специальность")
+    institution = models.ForeignKey('SuperAdmin.Institution', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Учреждение")
+    login_fkj = models.CharField(max_length=255, unique=True, verbose_name="Логин", null=True, blank=True)
     course = models.PositiveSmallIntegerField(
         choices=[
             (1, '1 курс'),
@@ -27,16 +33,36 @@ class User(AbstractUser):
         null=True, blank=True,
         verbose_name='Курс'
     )
-    speciality = models.ForeignKey('SuperAdmin.Speciality', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Специальность")
-    institution = models.ForeignKey('SuperAdmin.Institution', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Учреждение")
+    student_number = models.CharField(
+        max_length=6,
+        unique=True,
+        null=True,
+        blank=True,
+        verbose_name="Номер студента"
+    )
 
     USERNAME_FIELD = 'full_name'
     REQUIRED_FIELDS = []
+    readonly_fields = ['student_number']
 
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.full_name.replace(' ', '_').lower()
         super().save(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        if self.role == 'student' and not self.student_number:
+            self.student_number = self.generate_unique_student_number()
+        super().save(*args, **kwargs)
+
+    def generate_unique_student_number(self):
+        while True:
+            number = f"#{random.randint(10000, 99999)}"
+            if not User.objects.filter(student_number=number).exists():
+                return number
+
+    def __str__(self):
+        return f"{self.full_name} | Курс {self.course} | ID {self.id} | Номер {self.student_number}"
     
     class Meta:
         verbose_name = 'Пользователь'

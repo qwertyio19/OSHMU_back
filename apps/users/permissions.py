@@ -96,9 +96,7 @@ class IsStudentOrReadOnly(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # Если запрос только на чтение — разрешить
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Только студент может делать небезопасные действия
         return request.user.is_authenticated and request.user.role == 'student'

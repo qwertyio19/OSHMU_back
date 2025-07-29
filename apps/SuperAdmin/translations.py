@@ -1,5 +1,5 @@
 from modeltranslation.translator import register, TranslationOptions
-from apps.SuperAdmin.models import Faculty, Speciality, Document, Institution, TitlesAdmin
+from apps.SuperAdmin.models import Faculty, Speciality, Document, Institution, TitlesAdmin, Language
 
 
 @register(Institution)
@@ -13,6 +13,10 @@ class FacultyTranslation(TranslationOptions):
 @register(Speciality)
 class SpecialityTranslation(TranslationOptions):
     fields = ("speciality",)
+
+@register(Language)
+class LanguageTranslation(TranslationOptions):
+    fields = ("language",)
 
 @register(Document)
 class DocumentTranslationOptions(TranslationOptions):

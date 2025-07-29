@@ -16,8 +16,8 @@ class PracticeAdmin(TranslationAdmin):
         ('Английская версия', {
             'fields': ['number_en', 'practice_type_en', 'work_days_en', 'start_date_en', 'end_date_en', 'start_time_en', 'end_time_en', 'reception_en', 'semester_en', 'education_form_en', 'faculty_en', 'speciality_en'],
         }),
-        ("Курс", {
-            'fields': ('course',),
+        ("Курс / Студенты", {
+            'fields': ('course', 'students', 'institution', 'language'),
         }),
     )
 admin.site.register(Practice, PracticeAdmin)

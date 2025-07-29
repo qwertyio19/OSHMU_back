@@ -1,7 +1,13 @@
 from rest_framework import serializers
-from apps.FKJ.models import Practice, TitlesFkj, Faculty, Speciality
-from apps.students.models import StudentProfile
+from apps.FKJ.models import Practice, TitlesFkj, Faculty, Speciality, Language
+from apps.SuperAdmin.models import Institution
+from apps.users.models import User
 
+
+class ShortStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'full_name', 'course', 'student_number']
 
 
 class PracticeSerializer(serializers.ModelSerializer):
@@ -13,13 +19,28 @@ class PracticeSerializer(serializers.ModelSerializer):
         queryset=Speciality.objects.all(),
         label='Специальность'
     )
-    students = serializers.PrimaryKeyRelatedField(
-        queryset=StudentProfile.objects.all(),
-        many=True, label='Студенты'
+    language = serializers.PrimaryKeyRelatedField(
+        queryset=Language.objects.all(),
+        label='Язык обучения'
     )
+    institution = serializers.PrimaryKeyRelatedField(
+        queryset=Institution.objects.all(),
+        required=False,
+        allow_null=True,
+        label='Учреждения/Организация'
+    )
+
+    students = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(role='student'),
+        many=True,
+        write_only=True,
+        label='Студенты'
+    )
+    student_details = ShortStudentSerializer(source='students', many=True, read_only=True)
     work_days = serializers.MultipleChoiceField(
         choices=Practice.WEEKDAY_CHOICES,
-        label="Дни практики"
+        label="Дни практики",
+        required=True, allow_blank=False
     )
 
     class Meta:
@@ -36,10 +57,13 @@ class PracticeSerializer(serializers.ModelSerializer):
             'end_time',
             'faculty',
             'speciality',
+            'institution',
+            'language',
             'reception',
             'semester',
             'education_form',
             'students',
+            'student_details',
         ]
   
 

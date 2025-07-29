@@ -1,55 +1,7 @@
 from django.db import models
+from django.forms import ValidationError
 from apps.users.models import User
 from ckeditor.fields import RichTextField
-
-
-
-class StudentProfile(models.Model):
-
-    full_name = models.CharField(max_length=255, verbose_name="ФИО")
-    phone_number = models.CharField(max_length=20, verbose_name="Номер телефона")
-    birth_date = models.DateField(null=True, blank=True, verbose_name="Дата рождения")
-
-    hash_tag = models.CharField(max_length=255, blank=True, null=True, verbose_name='Хэштег студента')
-    avatarka = models.FileField(upload_to='media/avatarka', verbose_name='avatarka_file')
-    avatarka_url = models.URLField(verbose_name='avatarka_url')
-
-    institution = models.CharField(max_length=255, blank=True, verbose_name="Учреждение")
-    course = models.IntegerField(blank=True, null=True, verbose_name="Курс на котором учиться студент")
-    special = models.CharField(max_length=255, blank=True, null=True, verbose_name='Специальность студента')
-
-    practice_day = models.CharField(max_length=255, blank=True, verbose_name="День практики")
-    practice_schedule = models.CharField(max_length=255, blank=True, verbose_name="Граффик практики")
-    practice_raport = models.CharField(max_length=255, blank=True, verbose_name="Отчет о практики")
-
-    def __str__(self):
-        return self.full_name
-
-    class Meta:
-        verbose_name = "Профиль студента"
-        verbose_name_plural = "Профили студентов"
-
-
-
-class DiaryEntry(models.Model):
-
-    student = models.ForeignKey(StudentProfile ,on_delete=models.SET_NULL, related_name='diary', null=True, blank=True)
-    date = models.CharField(max_length=255, blank=True, null=True, verbose_name="дата начала и конца")
-    course = models.TextField(max_length=255, blank=True, null=True, verbose_name="курс студента")
-    organization = models.TextField(max_length=255, blank=True, null=True, verbose_name='организация - учреждение')
-
-    title_behind = models.TextField(max_length=255, blank=True, null=True, verbose_name='Заголовок внутри')
-    date_behind = models.CharField(max_length=255, blank=True, null=True, verbose_name='Дата внутри')
-    number_behind = models.IntegerField(blank=True, null=True, verbose_name='Нумерация')
-
-    def __str__(self):
-        student_name = self.student.full_name if self.student else "Неизвестный студент"
-        return f"Дневник {self.date} — {student_name}"
-
-    class Meta:
-        verbose_name = "Дневник"
-        verbose_name_plural = "Дневники"
-        ordering = ['-date']
 
 
 class StudentTitles(models.Model):
@@ -72,13 +24,30 @@ class StudentTitles(models.Model):
 
 
 class SendingReport(models.Model):
-    student = models.ForeignKey('FKJ.Practice', on_delete=models.SET_NULL, null=True, blank=True, related_name='sending_reports')
+    student = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='reports', null=True, blank=True)
+    practice = models.ForeignKey('FKJ.Practice', on_delete=models.SET_NULL, null=True, blank=True, related_name="student_practices")
 
     tasks = RichTextField(blank=True, null=True, verbose_name='Задача')
     report_text = RichTextField(blank=True, null=True, verbose_name='Текстовый отчет')
 
     link_report = models.URLField(verbose_name='Ссылка на документ отчета')
-    file_report = models.FileField(upload_to='media/files/', verbose_name='файл_отчета')
+    file_report = models.FileField(upload_to='media/files/', blank=True, null=True, verbose_name='файл отчета')
+    file_report_2 = models.FileField(upload_to='media/files/', blank=True, null=True, verbose_name='файл отчета')
+    file_report_3 = models.FileField(upload_to='media/files/', blank=True, null=True, verbose_name='файл отчета')
+    file_report_4 = models.FileField(upload_to='media/files/', blank=True, null=True, verbose_name='файл отчета')
+
+    def clean(self):
+        max_size_mb = 15
+        max_size = max_size_mb * 1024 * 1024
+        errors = {}
+
+        for field_name in ['file_report', 'file_report_2', 'file_report_3', 'file_report_4']:
+            file = getattr(self, field_name)
+            if file and file.size > max_size:
+                errors[field_name] = f'Файл слишком большой. Максимум {max_size_mb} МБ.'
+
+        if errors:
+            raise ValidationError(errors)
 
     def __str__(self):
         return self.tasks
@@ -88,16 +57,17 @@ class SendingReport(models.Model):
         verbose_name_plural = "Отправка отчётов"
 
 
-class StudentCharacteristic(models.Model):
-    student = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
-
-    title_document = models.CharField(max_length=255, blank=True, verbose_name="Заголовок Документы")
-    title_filename = models.FileField(upload_to='media/characteristik', blank=True, null=True, verbose_name="Файл документа характеристики")
+class Characteristics(models.Model):
+    file = models.FileField(upload_to='media/files/', verbose_name='Файл')
 
     def __str__(self):
-        student_name = self.student.full_name if self.student else "Неизвестный студент"
-        return f"Характеристика - {student_name}"
-
+        return str(self.file)
+    
+    def clean(self):
+        max_size_mb = 15
+        if self.file and self.file.size > max_size_mb * 1024 * 1024:
+            raise ValidationError({'file': f'Файл слишком большой. Максимум {max_size_mb} МБ.'})
+    
     class Meta:
-        verbose_name = "Характеристика студента"
-        verbose_name_plural = "Характеристики студентов"
+        verbose_name = 'Характеристика'
+        verbose_name_plural = 'Характеристики'

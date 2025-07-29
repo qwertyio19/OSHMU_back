@@ -7,6 +7,12 @@ from ckeditor.fields import RichTextField
 
 class Institution(models.Model):
 
+    fkj = models.ManyToManyField(
+        'users.User',
+        related_name='fkj',
+        limit_choices_to={'role': 'fkj'},
+        verbose_name='ФКЖ'
+    )
     logo = models.ImageField(
         upload_to='logos/',
         null=True, blank=True,
@@ -21,7 +27,7 @@ class Institution(models.Model):
     type = models.CharField(
         max_length=255,
         verbose_name='Тип',
-        help_text='Введите тип учреждения/оригнизации'
+        help_text='Введите тип учреждения/организации'
     )
 
     def validate_phone_number(value):
@@ -33,11 +39,11 @@ class Institution(models.Model):
         max_length=20,
         verbose_name='Контакт', 
         validators=[validate_phone_number],
-        help_text='Введите номер телефона учреждения/оригнизации'
+        help_text='Введите номер телефона учреждения/организации'
     )
     address = models.TextField(
         verbose_name='Адрес',
-        help_text='Введите адрес учреждения/оригнизации'
+        help_text='Введите адрес учреждения/организации'
     )
 
     def __str__(self):
@@ -73,6 +79,19 @@ class Speciality(models.Model):
     class Meta:
         verbose_name = "Специальность"
         verbose_name_plural = "Специальности"
+
+
+class Language(models.Model):
+    language = models.CharField(
+        max_length=255,
+        verbose_name='Язык обучения')
+
+    def __str__(self):
+        return self.language
+    
+    class Meta:
+        verbose_name = "Язык обучения"
+        verbose_name_plural = "Языки обучения"
 
 
 class Document(models.Model):

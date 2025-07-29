@@ -1,40 +1,28 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.users.permissions import IsAdmin, IsStudentOrReadOnly, IsAdminOrReadOnly
-from apps.students.models import StudentProfile, DiaryEntry, StudentCharacteristic, SendingReport, StudentTitles
-from apps.students.serializers import StudentProfileSerializer, DiaryEntrySerializer, StudentCharacteristicSerializer, SendingReportSerializer, StudentTitlesSerializer
+from apps.FKJ.models import Practice
+from apps.FKJ.serializers import PracticeSerializer
+from apps.users.permissions import IsStudentOrReadOnly, IsAdminOrReadOnly
+from apps.students.models import SendingReport, StudentTitles, Characteristics
+from apps.students.serializers import SendingReportSerializer, StudentTitlesSerializer, StudentProfileSerializer, CharacteristicsSerializer
 from apps.users.tasks import process_sending_report
-
-
-class StudentProfileView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request):
-        profile = StudentProfile.objects.first()
-        serializer = StudentProfileSerializer(profile)
-        return Response(serializer.data)
-
-    def put(self, request):
-        profile = StudentProfile.objects.first()
-        serializer = StudentProfileSerializer(profile, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 
-class DiaryEntryViewSet(viewsets.ModelViewSet):
-    serializer_class = DiaryEntrySerializer
+class MyPracticeListAPIView(generics.ListAPIView):
     permission_classes = [IsStudentOrReadOnly]
+    serializer_class = PracticeSerializer
 
     def get_queryset(self):
-        return DiaryEntry.objects.all()
-
-    def perform_create(self, serializer):
-        student = StudentProfile.objects.first()
-        serializer.save(student=student)
+        user = self.request.user
+        if user.is_anonymous:
+            return Practice.objects.none()
+        return Practice.objects.filter(students=user)
 
 
 class StudentTitlesViewSet(viewsets.ModelViewSet):
@@ -47,27 +35,25 @@ class SendingReportViewSet(viewsets.ModelViewSet):
     serializer_class = SendingReportSerializer
     permission_classes = [IsStudentOrReadOnly]
     queryset = SendingReport.objects.all()
+    parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
         report = serializer.save()
         process_sending_report.delay(report.id)
 
 
-class StudentCharacteristicView(APIView):
-    permission_classes = [IsStudentOrReadOnly]
+class StudentProfileView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        obj = StudentCharacteristic.objects.first()
-        serializer = StudentCharacteristicSerializer(obj)
+        user = request.user
+        if user.role != 'student':
+            raise PermissionDenied('Доступ разрешён только студентам.')
+        serializer = StudentProfileSerializer(user)
         return Response(serializer.data)
-
-    def put(self, request):
-        obj = StudentCharacteristic.objects.first()
-        serializer = StudentCharacteristicSerializer(obj, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-
+class CharacteristicsViewSet(viewsets.ModelViewSet):
+    serializer_class = CharacteristicsSerializer
+    permission_classes = [IsStudentOrReadOnly]
+    queryset = Characteristics.objects.all()

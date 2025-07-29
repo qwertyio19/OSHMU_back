@@ -1,9 +1,7 @@
 from django.contrib import admin
-from apps.SuperAdmin.models import Institution, Faculty, Speciality, TitlesAdmin
+from apps.SuperAdmin.models import Institution, Faculty, Speciality, TitlesAdmin, Document, Language
 from .translations import *
 from modeltranslation.admin import TranslationAdmin
-from django.contrib import admin
-from apps.SuperAdmin.models import Institution
 from apps.SuperAdmin.translations import *
 
 
@@ -21,7 +19,7 @@ class InstitutionAdmin(admin.ModelAdmin):
             'fields': ['name_en', 'type_en', 'address_en']
         }),
         ('Глобальные', {
-            'fields': ['logo', 'contact']
+            'fields': ['logo', 'contact', 'fkj']
         })
     )
 
@@ -56,13 +54,27 @@ class SpecialityAdmin(TranslationAdmin):
 admin.site.register(Speciality, SpecialityAdmin)
 
 
+class LanguageAdmin(TranslationAdmin):
+    fieldsets = (
+        ('Русская версия', {
+            'fields': ['language_ru'],
+        }),
+        ('Кыргызская версия', {
+            'fields': ['language_ky'],
+        }),
+        ('Английская версия', {
+            'fields': ['language_en'],
+        }),
+    )
+admin.site.register(Language, LanguageAdmin)
+
+
 class DocumentAdmin(TranslationAdmin):
     fieldsets = (
         ("Русская версия", {'fields': ('title_ru', 'content_ru')}),
         ("Кыргызская версия", {'fields': ('title_ky', 'content_ky')}),
         ("Английская версия", {'fields': ('title_en', 'content_en')}),
     )
-   
 admin.site.register(Document, DocumentAdmin)
 
 
