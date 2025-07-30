@@ -120,6 +120,8 @@ class AdminCreateSerializer(UserSerializer):
         return super().validate(attrs)
 
 
+
+
 class LoginLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -131,7 +133,6 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=False)
     password = serializers.CharField(required=False)
     full_name = serializers.CharField(required=False)
-    course = serializers.IntegerField(required=False)
 
     def validate(self, data):
         # 🔐 Вход для ФКЖ (login_fkj + password)
@@ -145,24 +146,21 @@ class LoginSerializer(serializers.Serializer):
                 pass
             raise serializers.ValidationError("Неверный логин или пароль для ФКЖ.")
 
-        # 🔐 Вход для Админа (full_name + password)
+        # 🔐 Вход для админа или студента (оба по full_name + password)
         elif 'full_name' in data and 'password' in data:
             try:
-                user = User.objects.get(full_name=data['full_name'], role='admin')
-                if user.check_password(data['password']):
-                    data['user'] = user
-                    return data
+                user = User.objects.get(full_name=data['full_name'])
+                if user.role in ['admin', 'student']:
+                    if user.check_password(data['password']):
+                        data['user'] = user
+                        return data
+                    else:
+                        raise serializers.ValidationError("Неверный пароль.")
+                else:
+                    raise serializers.ValidationError(
+                        "Роль не разрешена для входа.")
             except User.DoesNotExist:
-                pass
-            raise serializers.ValidationError("Неверное имя или пароль для администратора.")
-
-        # 🔐 Вход для Студента (full_name + course)
-        elif 'full_name' in data and 'course' in data:
-            try:
-                user = User.objects.get(full_name=data['full_name'], course=data['course'], role='student')
-                data['user'] = user
-                return data
-            except User.DoesNotExist:
-                raise serializers.ValidationError("Неверные имя или курс для студента.")
+                raise serializers.ValidationError(
+                    "Пользователь с таким именем не найден.")
 
         raise serializers.ValidationError("Недостаточно данных для входа.")

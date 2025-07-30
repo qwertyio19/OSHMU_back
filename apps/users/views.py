@@ -28,24 +28,29 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
+            print("✅ Serializer passed")
             user = serializer.validated_data['user']
+            print(f"🔐 User: {user}, role: {user.role}")
 
-            # Celery лог
-            ip = request.META.get('REMOTE_ADDR')
-            log_user_login.delay(user.id, ip)
+            # IP лог
+            ip = request.META.get('REMOTE_ADDR', '0.0.0.0')
+            print("🌍 IP:", ip)
+            # log_user_login.delay(user.id, ip)
 
             # JWT
             refresh = RefreshToken.for_user(user)
 
             # Сериализация по роли
-            if user.role == 'admin':
+            role = user.role.lower() if user.role else ''
+            if role == 'admin':
                 user_data = AdminDetailSerializer(user).data
-            elif user.role == 'fkj':
+            elif role == 'fkj':
                 user_data = FKJDetailSerializer(user).data
-            elif user.role == 'student':
+            elif role == 'student':
                 user_data = StudentDetailSerializer(user).data
             else:
-                user_data = {'id': user.id, 'full_name': user.full_name, 'role': user.role}
+                user_data = {'id': user.id,
+                             'full_name': user.full_name, 'role': user.role}
 
             return Response({
                 'refresh': str(refresh),
@@ -53,5 +58,6 @@ class LoginView(APIView):
                 'user': user_data
             })
 
+        print("❌ Errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

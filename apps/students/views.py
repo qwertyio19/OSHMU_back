@@ -39,7 +39,7 @@ class SendingReportViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         report = serializer.save()
-        process_sending_report.delay(report.id)
+        # process_sending_report.delay(report.id)
 
 
 class StudentProfileView(RetrieveAPIView):
